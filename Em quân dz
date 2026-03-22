@@ -1,0 +1,140 @@
+--[[
+    Script của em quân dz - Silent Assassin Edition
+    Key: Juntramcam
+]]
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "QUANDZ_HUB_V2"
+
+-- 1. HỆ THỐNG CHECK KEY
+local KeyFrame = Instance.new("Frame")
+KeyFrame.Parent = ScreenGui
+KeyFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+KeyFrame.Position = UDim2.new(0.5, -110, 0.5, -70)
+KeyFrame.Size = UDim2.new(0, 220, 0, 140)
+KeyFrame.Active = true
+KeyFrame.Draggable = true
+
+local KeyTitle = Instance.new("TextLabel")
+KeyTitle.Parent = KeyFrame
+KeyTitle.Size = UDim2.new(1, 0, 0, 35)
+KeyTitle.Text = "QUAN DZ HUB - NHẬP KEY"
+KeyTitle.TextColor3 = Color3.fromRGB(0, 255, 255)
+KeyTitle.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+
+local KeyInput = Instance.new("TextBox")
+KeyInput.Parent = KeyFrame
+KeyInput.Position = UDim2.new(0.1, 0, 0.4, 0)
+KeyInput.Size = UDim2.new(0.8, 0, 0, 35)
+KeyInput.PlaceholderText = "Key là gì nào..."
+KeyInput.Text = ""
+
+local CheckBtn = Instance.new("TextButton")
+CheckBtn.Parent = KeyFrame
+CheckBtn.Position = UDim2.new(0.2, 0, 0.75, 0)
+CheckBtn.Size = UDim2.new(0.6, 0, 0, 30)
+CheckBtn.Text = "XÁC NHẬN"
+CheckBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+CheckBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- 2. MENU CHÍNH
+local MainFrame = Instance.new("Frame")
+MainFrame.Visible = false
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.Position = UDim2.new(0.5, -75, 0.5, -100)
+MainFrame.Size = UDim2.new(0, 160, 0, 220)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+local Title = Instance.new("TextLabel")
+Title.Parent = MainFrame
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.Text = "Script của em quân dz"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+
+-- 3. CHỨC NĂNG ESP
+local function CreateESP(player)
+    local Billboard = Instance.new("BillboardGui")
+    Billboard.Name = "QuanDZ_ESP"
+    Billboard.AlwaysOnTop = true
+    Billboard.Size = UDim2.new(0, 100, 0, 50)
+    Billboard.Adornee = player.Character:WaitForChild("Head")
+    Billboard.Parent = player.Character:WaitForChild("Head")
+
+    local TextLabel = Instance.new("TextLabel")
+    TextLabel.Parent = Billboard
+    TextLabel.BackgroundTransparency = 1
+    TextLabel.Size = UDim2.new(1, 0, 1, 0)
+    TextLabel.Text = player.Name
+    TextLabel.TextColor3 = Color3.fromRGB(255, 0, 0) -- Màu đỏ cho địch
+    TextLabel.TextStrokeTransparency = 0
+    TextLabel.Font = Enum.Font.SourceSansBold
+    TextLabel.TextSize = 14
+end
+
+local function ToggleESP()
+    for _, v in pairs(game.Players:GetPlayers()) do
+        if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("Head") then
+            if not v.Character.Head:FindFirstChild("QuanDZ_ESP") then
+                CreateESP(v)
+            end
+        end
+    end
+end
+
+-- 4. CÁC NÚT TRONG MENU
+local Scroll = Instance.new("ScrollingFrame")
+Scroll.Parent = MainFrame
+Scroll.Position = UDim2.new(0, 0, 0, 40)
+Scroll.Size = UDim2.new(1, 0, 1, -45)
+Scroll.BackgroundTransparency = 1
+
+local List = Instance.new("UIListLayout")
+List.Parent = Scroll
+List.Padding = UDim.new(0, 5)
+
+local function NewButton(name, func)
+    local b = Instance.new("TextButton")
+    b.Parent = Scroll
+    b.Size = UDim2.new(1, -10, 0, 35)
+    b.Text = name
+    b.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    b.TextColor3 = Color3.fromRGB(255, 255, 255)
+    b.MouseButton1Click:Connect(func)
+end
+
+NewButton("Bật ESP", function()
+    ToggleESP()
+    print("Đã hiện tên địch!")
+end)
+
+NewButton("Hitbox 500", function()
+    spawn(function()
+        while true do
+            for _, v in pairs(game.Players:GetPlayers()) do
+                if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                    v.Character.HumanoidRootPart.Size = Vector3.new(500, 500, 500)
+                    v.Character.HumanoidRootPart.Transparency = 1 -- Không màu nhạt
+                    v.Character.HumanoidRootPart.CanCollide = false
+                end
+            end
+            task.wait(2)
+        end
+    end)
+    print("Đã bung Hitbox 500 tàng hình!")
+end)
+
+-- XỬ LÝ KEY
+CheckBtn.MouseButton1Click:Connect(function()
+    if KeyInput.Text == "Juntramcam" then
+        KeyFrame:Destroy()
+        MainFrame.Visible = true
+        print("Chào mừng Hoàng đã quay trở lại!")
+    else
+        KeyInput.Text = ""
+        KeyInput.PlaceholderText = "SAI KEY RỒI!"
+    end
+end)
