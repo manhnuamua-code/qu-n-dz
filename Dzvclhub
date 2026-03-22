@@ -1,0 +1,96 @@
+-- THIẾT LẬP THỜI HẠN (Năm, Tháng, Ngày)
+local HanSuDung = os.time({year = 2026, month = 4, day = 22, hour = 0, min = 0, sec = 0})
+local ThoiGianHienTai = os.time()
+
+if ThoiGianHienTai > HanSuDung then
+    game.Players.LocalPlayer:Kick("Script Quân dz đã hết hạn 1 tháng! Vui lòng vào Discord để gia hạn.")
+    return
+end
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Quân dz Tổng Hợp (Version 1.0)",
+   LoadingTitle = "Đang kiểm tra bản quyền...",
+   LoadingSubtitle = "Hạn dùng: 1 Tháng",
+   ConfigurationSaving = { Enabled = true, FolderName = "QuanDzHub", FileName = "Config" },
+   KeySystem = false 
+})
+
+-- TAB CHỨC NĂNG
+local Tab = Window:CreateTab("Tính năng VIP", 4483362458)
+
+-- 1. ESP (Hiện khung người chơi)
+Tab:CreateButton({
+   Name = "Bật ESP Player",
+   Callback = function()
+       -- Code ESP
+       for _, v in pairs(game.Players:GetPlayers()) do
+           if v ~= game.Players.LocalPlayer and v.Character then
+               local Highlight = Instance.new("Highlight", v.Character)
+               Highlight.FillColor = Color3.fromRGB(255, 255, 255)
+           end
+       end
+   end,
+})
+
+-- 2. FLY (Bay tự do)
+Tab:CreateToggle({
+   Name = "Chế độ Bay (Fly)",
+   CurrentValue = false,
+   Callback = function(Value)
+       _G.Fly = Value
+       local lp = game.Players.LocalPlayer
+       local mouse = lp:GetMouse()
+       task.spawn(function()
+           while _G.Fly do
+               if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
+                   lp.Character.HumanoidRootPart.Velocity = Vector3.new(0, 1, 0) -- Giữ cao độ
+               end
+               task.wait()
+           end
+       end)
+   end,
+})
+
+-- 3. AIMBOT (Tự khóa mục tiêu)
+Tab:CreateToggle({
+   Name = "Aimbot Lock",
+   CurrentValue = false,
+   Callback = function(Value)
+       _G.Aimbot = Value
+       game:GetService("RunService").RenderStepped:Connect(function()
+           if _G.Aimbot then
+               -- Logic tìm người gần nhất (Cơ bản)
+               local target = nil
+               -- (Code khóa mục tiêu vào đây)
+           end
+       end)
+   end,
+})
+
+-- 4. INF JUMP (Nhảy không giới hạn)
+Tab:CreateToggle({
+   Name = "Infinite Jump",
+   CurrentValue = false,
+   Callback = function(Value)
+       _G.InfJump = Value
+       game:GetService("UserInputService").JumpRequest:Connect(function()
+           if _G.InfJump then
+               game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+           end
+       end)
+   end,
+})
+
+-- Tab Thông tin & Liên hệ
+local InfoTab = Window:CreateTab("Hỗ trợ", 4483362458)
+InfoTab:CreateLabel("Script: Quân dz Tổng Hợp")
+InfoTab:CreateLabel("Trạng thái: Đang hoạt động")
+InfoTab:CreateButton({
+   Name = "Sao chép Discord Quân dz",
+   Callback = function()
+       setclipboard("Link Discord của bạn ở đây")
+       Rayfield:Notify({Title = "Thông báo", Content = "Đã copy link!", Duration = 2})
+   end,
+})
