@@ -1,0 +1,104 @@
+if not game:IsLoaded() then game.Loaded:Wait() end
+
+getgenv().Setting = {
+    ["AutoHunt"] = false,
+    ["FlySpeed"] = 350, -- Tốc độ bay giống RedZ
+}
+
+local lp = game.Players.LocalPlayer
+local rs = game:GetService("RunService")
+
+-- ================= GUI WIBU EDITION =================
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+local Main = Instance.new("Frame", ScreenGui)
+Main.Size = UDim2.new(0, 250, 0, 180)
+Main.Position = UDim2.new(0.5, -125, 0.2, 0)
+Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Main.Draggable = true
+Main.Active = true
+
+-- Ảnh nền Wibu (Có thể thay ID ảnh khác nếu muốn)
+local BgImage = Instance.new("ImageLabel", Main)
+BgImage.Size = UDim2.new(1, 0, 1, 0)
+BgImage.Image = "rbxassetid://18205466038" -- ID ảnh Anime/Wibu
+BgImage.ImageTransparency = 0.6
+BgImage.BackgroundTransparency = 1
+
+local Title = Instance.new("TextLabel", Main)
+Title.Size = UDim2.new(1, 0, 0.2, 0)
+Title.Text = "★ QUANDZ HUB ★"
+Title.TextColor3 = Color3.fromRGB(255, 100, 200) -- Màu hồng Wibu
+Title.Font = Enum.Font.SpecialElite
+Title.BackgroundTransparency = 1
+Title.TextSize = 18
+
+local HuntBtn = Instance.new("TextButton", Main)
+HuntBtn.Size = UDim2.new(0.9, 0, 0.25, 0)
+HuntBtn.Position = UDim2.new(0.05, 0, 0.3, 0)
+HuntBtn.Text = "FLY HUNT: OFF"
+HuntBtn.BackgroundColor3 = Color3.fromRGB(30, 0, 30)
+HuntBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", HuntBtn)
+
+local NextBtn = Instance.new("TextButton", Main)
+NextBtn.Size = UDim2.new(0.9, 0, 0.25, 0)
+NextBtn.Position = UDim2.new(0.05, 0, 0.65, 0)
+NextBtn.Text = "NEXT TARGET (SKIP)"
+NextBtn.BackgroundColor3 = Color3.fromRGB(50, 0, 50)
+NextBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", NextBtn)
+
+-- ================= LOGIC BAY (FLY) =================
+local Target = nil
+local Blacklist = {}
+
+HuntBtn.MouseButton1Click:Connect(function()
+    getgenv().Setting.AutoHunt = not getgenv().Setting.AutoHunt
+    HuntBtn.Text = getgenv().Setting.AutoHunt and "FLY HUNT: ON" or "FLY HUNT: OFF"
+    HuntBtn.BackgroundColor3 = getgenv().Setting.AutoHunt and Color3.fromRGB(100, 0, 100) or Color3.fromRGB(30, 0, 30)
+end)
+
+NextBtn.MouseButton1Click:Connect(function()
+    if Target then Blacklist[Target.Name] = tick(); Target = nil end
+end)
+
+-- Xuyên tường & Chống nước (Có lương tâm)
+rs.Stepped:Connect(function()
+    if lp.Character then
+        for _, v in pairs(lp.Character:GetDescendants()) do
+            if v:IsA("BasePart") then v.CanCollide = false end
+        end
+    end
+end)
+
+spawn(function()
+    while task.wait() do
+        if getgenv().Setting.AutoHunt then
+            pcall(function()
+                if Target and Target.Character and Target.Character:FindFirstChild("HumanoidRootPart") and Target.Character.Humanoid.Health > 0 then
+                    local myRoot = lp.Character.HumanoidRootPart
+                    local targetRoot = Target.Character.HumanoidRootPart
+                    local targetPos = targetRoot.CFrame * CFrame.new(0, 0, 3.5)
+                    local dist = (myRoot.Position - targetPos.Position).Magnitude
+                    
+                    if dist > 3 then
+                        -- Cơ chế bay lướt cực nhanh (giống RedZ)
+                        myRoot.Velocity = (targetPos.Position - myRoot.Position).Unit * getgenv().Setting.FlySpeed
+                    else
+                        -- Dính sát thì đứng im để Hoàng vả tay
+                        myRoot.Velocity = Vector3.new(0, 0, 0)
+                        myRoot.CFrame = targetPos
+                    end
+                else
+                    Target = nil
+                    for _, v in pairs(game.Players:GetPlayers()) do
+                        if v ~= lp and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 and not v.Character:FindFirstChild("ForceField") and not Blacklist[v.Name] then
+                            Target = v
+                            break
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
