@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GET KEY VIP - QUANDZ HUB</title>
+    <style>
+        :root { --neon: #00f3ff; --pink: #ff00ff; --bg: #0a0a0a; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; margin: 0; }
+        .container { border: 2px solid var(--neon); border-radius: 25px; padding: 30px; max-width: 400px; margin: 50px auto; background: #000; box-shadow: 0 0 30px rgba(0,243,255,0.2); }
+        h2 { color: var(--neon); text-shadow: 0 0 10px var(--neon); text-transform: uppercase; margin-bottom: 25px; }
+        
+        .btn-task { display: block; width: 100%; padding: 15px; margin: 15px 0; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; text-decoration: none; font-size: 15px; transition: 0.3s; color: #fff; background: #fe2c55; box-shadow: 0 4px 15px rgba(254, 44, 85, 0.3); }
+        .btn-task:active { transform: scale(0.95); }
+
+        #timer-box { display: none; color: #ffeb3b; font-weight: bold; margin: 20px 0; font-size: 18px; }
+        #key-display { display: none; margin-top: 25px; padding: 20px; border: 2px dashed #0f0; background: rgba(0,255,0,0.1); color: #0f0; font-weight: bold; font-family: monospace; font-size: 22px; cursor: pointer; border-radius: 12px; animation: glow 1s infinite alternate; }
+        @keyframes glow { from { box-shadow: 0 0 5px #0f0; } to { box-shadow: 0 0 20px #0f0; } }
+        
+        .note { font-size: 11px; color: #555; margin-top: 30px; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🔑 HỆ THỐNG GET KEY</h2>
+        <p style="font-size: 13px; color: #aaa; margin-bottom: 20px;">Làm nhiệm vụ Like Video để lấy mã VIP hôm nay</p>
+        
+        <a href="https://www.tiktok.com/@thegioinaykocantinhyeu" target="_blank" class="btn-task" id="task-btn" onclick="startTimer()">
+            BẤM LIKE VIDEO MỚI NHẤT
+        </a>
+
+        <div id="timer-box">VUI LÒNG ĐỢI: <span id="seconds">15</span>s</div>
+
+        <div id="key-display" onclick="copyKey()">ĐANG TẠO MÃ...</div>
+        
+        <p id="copy-msg" style="display:none; color: #aaa; font-size: 10px; margin-top: 10px;">Chạm vào mã để sao chép!</p>
+
+        <p class="note">© QUANDZ HUB - thegioinaykocantinhyeu<br>Mã sẽ thay đổi sau mỗi 24h</p>
+    </div>
+
+    <script>
+        // Danh sách 200 Key đồng bộ với App Enjector
+        const keyList = [];
+        for (let i = 1; i <= 200; i++) {
+            keyList.push("quandz-vip-" + i);
+        }
+
+        let isRunning = false;
+
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true;
+            
+            // Hiện đồng hồ đếm ngược
+            document.getElementById('timer-box').style.display = "block";
+            let timeLeft = 15; // Ông có thể tăng lên 30 nếu muốn tụi nó đợi lâu hơn
+            
+            let countdown = setInterval(() => {
+                timeLeft--;
+                document.getElementById('seconds').innerText = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    document.getElementById('timer-box').style.display = "none";
+                    showKey();
+                }
+            }, 1000);
+        }
+
+        function showKey() {
+            // Thuật toán lấy Key theo ngày (dayOfYear % 200)
+            let now = new Date();
+            let start = new Date(now.getFullYear(), 0, 0);
+            let diff = now - start;
+            let dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+            let todayKey = keyList[dayOfYear % 200];
+
+            let kBox = document.getElementById('key-display');
+            kBox.innerText = todayKey;
+            kBox.style.display = "block";
+            document.getElementById('copy-msg').style.display = "block";
+            document.getElementById('task-btn').innerText = "NHIỆM VỤ HOÀN THÀNH ✅";
+            document.getElementById('task-btn').style.background = "#444";
+            document.getElementById('task-btn').style.pointerEvents = "none";
+        }
+
+        function copyKey() {
+            let k = document.getElementById('key-display').innerText;
+            navigator.clipboard.writeText(k.trim());
+            alert("Đã copy mã: " + k + "\nQuay lại App để dán nhé!");
+        }
+
+        // Chống Reset trang để lấy key lậu (Tắt web là phải làm lại)
+        window.onbeforeunload = function() {
+            return "Bạn có chắc muốn rời đi? Tiến độ Get Key sẽ bị mất!";
+        };
+    </script>
+</body>
+</html>
