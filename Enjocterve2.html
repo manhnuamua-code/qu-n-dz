@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUANDZ HUB - NO RESET SYSTEM</title>
+    <style>
+        body { background: #000; color: #00ff41; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        .wrapper { width: 340px; border: 2px solid #00ff41; border-radius: 12px; padding: 20px; background: rgba(0, 10, 0, 0.95); box-shadow: 0 0 25px #00ff41; text-align: center; }
+        input { width: 85%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #00ff41; color: #fff; text-align: center; border-radius: 5px; font-weight: bold; outline: none; }
+        .btn-kick { width: 100%; padding: 12px; background: #00ff41; color: #000; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; text-transform: uppercase; margin-bottom: 10px; }
+        .btn-getkey { width: 100%; padding: 10px; background: transparent; color: #00ffff; border: 1px solid #00ffff; font-weight: bold; cursor: pointer; border-radius: 5px; text-decoration: none; display: block; font-size: 13px; }
+        #main-menu { display: none; }
+        .mod-item { border: 1px solid #003300; margin: 8px 0; padding: 10px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; background: #000a00; }
+        .sw { position: relative; width: 40px; height: 20px; }
+        .sw input { opacity: 0; width: 0; height: 0; }
+        .sl { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #222; border-radius: 20px; border: 1px solid #00ff41; transition: .4s; }
+        .sl:before { content: ""; position: absolute; height: 12px; width: 12px; left: 4px; bottom: 3px; background: #00ff41; border-radius: 50%; transition: .4s; }
+        input:checked + .sl { background: #00ff41; }
+        input:checked + .sl:before { transform: translateX(18px); background: #000; }
+        #timer { color: #ff0000; font-weight: bold; margin-bottom: 15px; border: 1px solid red; display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+<div id="lock-screen" class="wrapper">
+    <h2>QUANDZ HUB</h2>
+    <p style="font-size: 11px; color: #888; margin-bottom: 15px;">HỆ THỐNG KHÓA THIẾT BỊ 24H</p>
+    <input type="number" id="key-input" placeholder="Nhập Key từ Web...">
+    <button class="btn-kick" onclick="validate()">KÍCH HOẠT</button>
+    <a href="https://raw.githack.com/manhnuamua-code/qu-n-dz/refs/heads/main/index.html" class="btn-getkey" target="_blank">LẤY KEY TẠI ĐÂY</a>
+</div>
+
+<div id="main-menu" class="wrapper">
+    <h2 style="font-size: 18px;">QUANDZ MOD PANEL</h2>
+    <div id="timer">Đang tính toán thời gian...</div>
+    <div class="mod-item"><span>Aimbot Head</span><label class="sw"><input type="checkbox"><span class="sl"></span></label></div>
+    <div class="mod-item"><span>Silent Aim</span><label class="sw"><input type="checkbox"><span class="sl"></span></label></div>
+    <div class="mod-item"><span>Unlock 120 FPS</span><label class="sw"><input type="checkbox" onchange="rt(this)"><span class="sl"></span></label></div>
+</div>
+
+<script>
+    // 1. Tạo dấu vân tay thiết bị ảo (Device ID) để chống reset bằng cách xóa cache thông thường
+    const deviceID = navigator.hardwareConcurrency + navigator.language + screen.colorDepth;
+
+    function getTodayKey() {
+        const d = new Date();
+        return (d.getDate() * 123) + ((d.getMonth() + 1) * 456) + 789;
+    }
+
+    function validate() {
+        const input = document.getElementById('key-input').value;
+        if (parseInt(input) === getTodayKey()) {
+            // Lưu mốc thời gian + DeviceID vào máy
+            const expireData = {
+                time: new Date().getTime() + 86400000,
+                id: deviceID
+            };
+            localStorage.setItem('quandz_session', JSON.stringify(expireData));
+            startApp();
+        } else {
+            alert("Key sai! Vui lòng kiểm tra lại.");
+        }
+    }
+
+    function startApp() {
+        document.getElementById('lock-screen').style.display = 'none';
+        document.getElementById('main-menu').style.display = 'block';
+        updateTimer(); 
+        setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+        const session = JSON.parse(localStorage.getItem('quandz_session'));
+        if (!session) return;
+
+        const now = new Date().getTime();
+        const diff = session.time - now;
+
+        if (diff <= 0) {
+            localStorage.removeItem('quandz_session');
+            location.reload();
+            return;
+        }
+
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        document.getElementById('timer').innerText = `Hết hạn sau: ${h}:${m}:${s}`;
+    }
+
+    function rt(el) {
+        if (!navigator.userAgent.includes("Magisk") && !window.Android) {
+            alert("Yêu cầu Magisk Root!");
+            el.checked = false;
+        }
+    }
+
+    // KIỂM TRA PHIÊN LÀM VIỆC KHI MỞ APP (QUAN TRỌNG NHẤT)
+    window.onload = function() {
+        const session = JSON.parse(localStorage.getItem('quandz_session'));
+        const now = new Date().getTime();
+
+        // Kiểm tra: Có dữ liệu + Chưa hết hạn + Đúng thiết bị
+        if (session && now < session.time && session.id === deviceID) {
+            startApp();
+        } else {
+            // Nếu hết hạn hoặc sai thiết bị thì xóa để nhập key mới
+            localStorage.removeItem('quandz_session');
+        }
+    }
+</script>
+</body>
+</html>
