@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUANDZ HUB - VIP MENU</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { width: 330px; border: 2px solid #0f0; padding: 20px; background: #010; box-shadow: 0 0 20px #0f0; border-radius: 12px; text-align: center; }
+        input { width: 85%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #0f0; color: #0f0; text-align: center; border-radius: 5px; font-weight: bold; }
+        button { width: 100%; padding: 12px; background: #0f0; color: #000; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        #time { color: #ff0000; font-weight: bold; margin: 15px 0; border: 1px solid red; display: none; padding: 5px; border-radius: 20px; font-size: 14px; }
+        .item { border-bottom: 1px solid #020; padding: 12px 5px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Toggle Switch */
+        .sw { position: relative; width: 40px; height: 20px; }
+        .sw input { opacity: 0; width: 0; height: 0; }
+        .sl { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #222; border-radius: 20px; border: 1px solid #0f0; transition: .4s; }
+        .sl:before { content: ""; position: absolute; height: 12px; width: 12px; left: 4px; bottom: 3px; background: #0f0; border-radius: 50%; transition: .4s; }
+        input:checked + .sl { background: #0f0; }
+        input:checked + .sl:before { transform: translateX(18px); background: #000; }
+        
+        .tag { font-size: 10px; color: #888; text-align: left; margin-top: 10px; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+<div id="login" class="box">
+    <h2 style="margin:0">QUANDZ HUB</h2>
+    <p style="font-size:10px; color:#555">HỆ THỐNG 500 KEY SỐ VIP</p>
+    <input type="number" id="key" placeholder="Nhập Key (6 chữ số)...">
+    <button onclick="check()">KÍCH HOẠT MENU</button>
+    <p style="margin-top:15px"><a href="https://discord.gg/Btk7vQ8PJ" style="color:#5865F2; text-decoration:none; font-size:12px; font-weight:bold">Vào Discord Lấy Key</a></p>
+</div>
+
+<div id="menu" class="box" style="display:none">
+    <h3 style="margin:0">QUANDZ MOD PANEL</h3>
+    <div id="time">Hết hạn sau: --:--:--</div>
+
+    <div class="tag">● Chức năng No Root</div>
+    <div class="item"><span>Aimbot Head</span><label class="sw"><input type="checkbox" onchange="msg('Aimbot')"><span class="sl"></span></label></div>
+    <div class="item"><span>Silent Aim</span><label class="sw"><input type="checkbox" onchange="msg('Silent')"><span class="sl"></span></label></div>
+    <div class="item"><span>Aim FOV</span><label class="sw"><input type="checkbox" onchange="msg('FOV')"><span class="sl"></span></label></div>
+
+    <div class="tag" style="color:red">● Chức năng Root Magisk</div>
+    <div class="item"><span>Mod Skin VIP</span><label class="sw"><input type="checkbox" onchange="rt(this, 'Skin')"><span class="sl"></span></label></div>
+    <div class="item"><span>Unlock 120 FPS</span><label class="sw"><input type="checkbox" onchange="rt(this, 'FPS')"><span class="sl"></span></label></div>
+    
+    <p id="log" style="font-size:9px; color:#444; margin-top:10px">Sẵn sàng...</p>
+</div>
+
+<script>
+    // TẠO 500 KEY SỐ: Từ 100001 đến 100500
+    const keys = Array.from({length: 500}, (_, i) => (100001 + i).toString());
+
+    function check() {
+        let input = document.getElementById('key').value;
+        if(keys.includes(input)) {
+            // Lưu mốc 24h: Giờ hiện tại + 86.400.000 ms
+            localStorage.setItem('q_auth', 'true');
+            localStorage.setItem('q_time', new Date().getTime() + 86400000);
+            alert("Kích hoạt thành công! Bạn có 24h sử dụng.");
+            openMenu();
+        } else {
+            alert("Key số không tồn tại!");
+        }
+    }
+
+    function openMenu() {
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('menu').style.display = 'block';
+        document.getElementById('time').style.display = 'inline-block';
+        setInterval(updateTime, 1000);
+    }
+
+    function updateTime() {
+        let diff = localStorage.getItem('q_time') - new Date().getTime();
+        if(diff <= 0) {
+            localStorage.clear();
+            location.reload();
+        }
+        let h = Math.floor(diff/3600000);
+        let m = Math.floor((diff%3600000)/60000);
+        let s = Math.floor((diff%60000)/1000);
+        document.getElementById('time').innerText = `Hết hạn sau: ${h}h ${m}m ${s}s`;
+    }
+
+    function msg(n) {
+        document.getElementById('log').innerText = "Đã thực hiện: " + n;
+    }
+
+    function rt(el, n) {
+        // Kiểm tra Magisk giả lập
+        if(!navigator.userAgent.includes("Magisk") && !window.Android) {
+            alert("LỖI: Máy bạn chưa Root bằng Magisk!");
+            el.checked = false;
+        } else {
+            msg(n);
+        }
+    }
+
+    // Tự động vào lại nếu còn hạn 24h
+    window.onload = () => {
+        let expire = localStorage.getItem('q_time');
+        if(expire && new Date().getTime() < expire) {
+            openMenu();
+        } else {
+            localStorage.clear();
+        }
+    }
+</script>
+</body>
+</html>
