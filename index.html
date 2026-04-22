@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>GET KEY QUANDZ HUB</title>
+    <style>
+        body { background: #000; color: #0f0; text-align: center; font-family: monospace; padding-top: 50px; }
+        .key-box { font-size: 40px; border: 2px solid #0f0; display: inline-block; padding: 20px; margin: 20px; box-shadow: 0 0 20px #0f0; }
+    </style>
+</head>
+<body>
+    <h1>CHÀO MỪNG ĐẾN VỚI QUANDZ HUB</h1>
+    <p>Key sẽ tự động đổi sau 0h mỗi ngày</p>
+    <div class="key-box" id="display-key">Đang tạo...</div>
+    <p>Hãy copy số trên và dán vào App của ông</p>
+
+    <script>
+        function generateKey() {
+            const d = new Date();
+            // Công thức bí mật: (Ngày * 123) + (Tháng * 456) + 789
+            // Ví dụ: Ngày 22, tháng 4 -> (22*123) + (4*456) + 789 = 5319
+            const secret = (d.getDate() * 123) + ((d.getMonth() + 1) * 456) + 789;
+            document.getElementById('display-key').innerText = secret;
+        }
+        generateKey();
+    </script>
+</body>
+</html>
