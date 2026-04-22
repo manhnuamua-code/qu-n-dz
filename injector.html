@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUANDZ HUB INJECTOR</title>
+    <style>
+        /* Giao diện chuẩn Hacker QuanDz */
+        body { background: #000; color: #00ff41; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        .wrapper { width: 340px; border: 2px solid #00ff41; border-radius: 12px; padding: 20px; background: rgba(0, 10, 0, 0.95); box-shadow: 0 0 25px #00ff41; text-align: center; }
+        h2 { margin: 0 0 15px; text-shadow: 0 0 10px #0f0; font-size: 20px; }
+        input { width: 85%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #00ff41; color: #fff; text-align: center; border-radius: 5px; font-weight: bold; outline: none; }
+        .btn-kick { width: 100%; padding: 12px; background: #00ff41; color: #000; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; text-transform: uppercase; margin-bottom: 10px; }
+        .btn-getkey { width: 100%; padding: 10px; background: transparent; color: #00ffff; border: 1px solid #00ffff; font-weight: bold; cursor: pointer; border-radius: 5px; text-decoration: none; display: block; font-size: 13px; }
+        
+        /* Menu MOD */
+        #main-menu { display: none; }
+        .mod-item { border: 1px solid #003300; margin: 8px 0; padding: 10px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; background: #000a00; }
+        
+        /* Toggle Switch */
+        .sw { position: relative; width: 40px; height: 20px; }
+        .sw input { opacity: 0; width: 0; height: 0; }
+        .sl { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #222; border-radius: 20px; border: 1px solid #00ff41; transition: .4s; }
+        .sl:before { content: ""; position: absolute; height: 12px; width: 12px; left: 4px; bottom: 3px; background: #00ff41; border-radius: 50%; transition: .4s; }
+        input:checked + .sl { background: #00ff41; }
+        input:checked + .sl:before { transform: translateX(18px); background: #000; }
+
+        #timer { color: #ff0000; font-weight: bold; margin-bottom: 15px; border: 1px solid red; display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 13px; }
+        .cat { text-align: left; font-size: 10px; color: #666; margin: 10px 0 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div id="lock-screen" class="wrapper">
+    <h2>QUANDZ HUB</h2>
+    <p style="font-size: 11px; color: #888; margin-bottom: 15px;">HỆ THỐNG VIP INJECTOR</p>
+    
+    <input type="number" id="key-input" placeholder="Dán Key vào đây...">
+    
+    <button class="btn-kick" onclick="validate()">KÍCH HOẠT MENU</button>
+    
+    <a href="https://raw.githack.com/manhnuamua-code/qu-n-dz/refs/heads/main/index.html" class="btn-getkey" target="_blank">BẤM ĐỂ LẤY KEY (GET KEY)</a>
+</div>
+
+<div id="main-menu" class="wrapper">
+    <h2 style="font-size: 18px;">QUANDZ MOD PANEL</h2>
+    <div id="timer">Hạn dùng: 24:00:00</div>
+
+    <div class="cat">● CHỨC NĂNG AIMBOT (NO ROOT)</div>
+    <div class="mod-item"><span>Aimbot Head</span><label class="sw"><input type="checkbox"><span class="sl"></span></label></div>
+    <div class="mod-item"><span>Silent Aim</span><label class="sw"><input type="checkbox"><span class="sl"></span></label></div>
+    <div class="mod-item"><span>Aim FOV</span><label class="sw"><input type="checkbox"><span class="sl"></span></label></div>
+
+    <div class="cat" style="color:red">● CHỨC NĂNG HỆ THỐNG (ROOT)</div>
+    <div class="mod-item"><span>Mod Skin VIP</span><label class="sw"><input type="checkbox" onchange="rt(this)"><span class="sl"></span></label></div>
+    <div class="mod-item"><span>Unlock 120 FPS</span><label class="sw"><input type="checkbox" onchange="rt(this)"><span class="sl"></span></label></div>
+</div>
+
+<script>
+    // 1. Công thức toán học tính Key (Tự đổi sau 0h mỗi ngày)
+    function getTodayKey() {
+        const d = new Date();
+        // Công thức: (Ngày * 123) + (Tháng * 456) + 789
+        // Ông nhớ dán đúng công thức này vào trang Web index.html kia nhé
+        return (d.getDate() * 123) + ((d.getMonth() + 1) * 456) + 789;
+    }
+
+    // 2. Kiểm tra Key khi bấm nút Kích Hoạt
+    function validate() {
+        const input = document.getElementById('key-input').value;
+        if (parseInt(input) === getTodayKey()) {
+            // Nhập đúng -> Lưu mốc thời gian hết hạn (bây giờ + 24 tiếng)
+            const expire = new Date().getTime() + 86400000;
+            localStorage.setItem('q_expire', expire);
+            localStorage.setItem('q_auth', 'true');
+            startApp();
+        } else {
+            alert("Key sai hoặc đã hết hạn ngày hôm nay!");
+        }
+    }
+
+    // 3. Mở Menu MOD
+    function startApp() {
+        document.getElementById('lock-screen').style.display = 'none';
+        document.getElementById('main-menu').style.display = 'block';
+        setInterval(updateTimer, 1000);
+    }
+
+    // 4. Đồng hồ đếm ngược 24h
+    function updateTimer() {
+        const expire = localStorage.getItem('q_expire');
+        const now = new Date().getTime();
+        const diff = expire - now;
+
+        if (diff <= 0) {
+            localStorage.clear();
+            location.reload(); // Hết hạn thì bắt nhập key lại
+            return;
+        }
+
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        document.getElementById('timer').innerText = `Hết hạn sau: ${h}:${m}:${s}`;
+    }
+
+    // 5. Kiểm tra Root Magisk
+    function rt(el) {
+        if (!navigator.userAgent.includes("Magisk") && !window.Android) {
+            alert("Lỗi: Máy chưa cài Magisk (Root)!");
+            el.checked = false;
+        }
+    }
+
+    // 6. KHÔNG BỊ RESET KEY (Tự động vào Menu nếu còn trong 24h)
+    window.onload = function() {
+        const expire = localStorage.getItem('q_expire');
+        const auth = localStorage.getItem('q_auth');
+        const now = new Date().getTime();
+
+        if (auth === 'true' && expire && now < expire) {
+            startApp();
+        } else {
+            localStorage.clear(); // Xóa sạch nếu đã hết hạn
+        }
+    }
+</script>
+</body>
+</html>
